@@ -1,8 +1,10 @@
 package create
 
 import (
+	"errors"
 	"fmt"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	"time"
 )
 
@@ -51,4 +53,30 @@ func SelectOmit() {
 	data.PublishTime = &now
 
 	DB.Omit("Subject", "Likes", "UpdatedAt").Create(&data)
+}
+
+func (c *NewContent) BeforeCreate(db *gorm.DB) error {
+	// 业务
+	if c.PublishTime == nil {
+		now := time.Now()
+		c.PublishTime = &now
+	}
+
+	// 配置
+	db.Statement.AddClause(clause.OnConflict{UpdateAll: true})
+
+	return nil
+}
+
+// 出现一个错误
+func (c *NewContent) AfterCreate(db *gorm.DB) error {
+	return errors.New("custom error")
+}
+
+func Hook() {
+	DB.AutoMigrate(&NewContent{})
+
+	content := NewContent{Likes: 10, Subject: "HookTest"}
+
+	DB.Create(&content)
 }

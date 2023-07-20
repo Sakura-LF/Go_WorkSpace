@@ -13,3 +13,7 @@ func TestDefaultValueOften(t *testing.T) {
 func TestSelectOmit(t *testing.T) {
 	SelectOmit()
 }
+
+func TestHook(t *testing.T) {
+	Hook()
+}

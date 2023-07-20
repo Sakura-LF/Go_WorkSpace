@@ -153,3 +153,28 @@ func (L *SingleLinkedList) DeleteIndex(position int) any {
 	}
 	return nil
 }
+
+func (L *SingleLinkedList) FindFirstCommonNode(List1 *SingleLinkedList) *Node {
+	//使用Map
+	Map := make(map[any]*Node)
+	HeadNode := L.Head
+	//遍历第一个链表,将Data和next存到Map里面
+	for HeadNode != nil {
+		Map[HeadNode.Data] = HeadNode.Next
+		HeadNode = HeadNode.Next
+	}
+	//测试是否遍历正确
+	fmt.Println(Map)
+
+	//测试
+	HeadNode1 := List1.Head
+	//将链表中和节点挨个和Map里面地址或者值比较
+	for HeadNode1 != nil {
+		_, b := Map[HeadNode1.Data]
+		if b {
+			return HeadNode1
+		}
+		HeadNode1 = HeadNode1.Next
+	}
+	return nil
+}
