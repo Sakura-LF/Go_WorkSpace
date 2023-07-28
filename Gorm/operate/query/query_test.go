@@ -1,6 +1,8 @@
 package query
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestGetPrimaryKey(t *testing.T) {
 	GetPrimaryKey()
@@ -28,4 +30,39 @@ func TestQuerySelectEXP(t *testing.T) {
 
 func TestQueryDistinct(t *testing.T) {
 	QueryDistinct()
+}
+
+func TestWhereMethod(t *testing.T) {
+	WhereMethod()
+}
+
+func TestWhereType(t *testing.T) {
+	WhereType()
+}
+
+func TestPlaceHolder(t *testing.T) {
+	PlaceHolder()
+}
+
+func TestOrderBy(t *testing.T) {
+	OrderBy()
+}
+
+func TestPageOperation(t *testing.T) {
+	PageOperation(Page{
+		Page:     3,
+		PageSize: 15,
+	})
+}
+
+func TestLocking(t *testing.T) {
+	Locking()
+}
+
+func TestSubQuery(t *testing.T) {
+	SubQuery()
+}
+
+func TestQueryHook(t *testing.T) {
+	QueryHook()
 }

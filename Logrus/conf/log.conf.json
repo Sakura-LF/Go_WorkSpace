@@ -1,0 +1,4 @@
+{
+  "log_dir": "./Logrus.log",
+  "log_level": "info"
+}
