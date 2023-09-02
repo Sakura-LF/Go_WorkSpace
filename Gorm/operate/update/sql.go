@@ -1,6 +1,7 @@
 package update
 
 import (
+	"Go_WorkSpace/Gorm/Transaction"
 	"context"
 	"fmt"
 	"gorm.io/gorm"
@@ -20,7 +21,7 @@ func Sql() {
 	sql := "SELECT `id`,`subject`,`likes` FROM `contents` where `likes` > ? "
 
 	// 执行sql,并扫描结果
-	if err := DB.Raw(sql, 1000).Scan(&rs).Error; err != nil {
+	if err := Transaction.DB.Raw(sql, 1000).Scan(&rs).Error; err != nil {
 		log.Fatalln(err)
 	}
 	fmt.Println(rs)
@@ -31,7 +32,7 @@ func SqlExc() {
 	sql := "INSERT INTO contents(id,subject,likes) values (?,?,?)"
 
 	//执行sql语句,Exec()
-	if err := DB.Exec(sql, 50, "执行类sql语句", 125).Error; err != nil {
+	if err := Transaction.DB.Exec(sql, 50, "执行类sql语句", 125).Error; err != nil {
 		log.Fatalln(err)
 	}
 }
@@ -41,7 +42,7 @@ func Rows() {
 	sql := "SELECT `id`,`subject`,`likes` FROM `contents` where `likes` > ? "
 
 	// 执行sql,并扫描结果
-	rows, err := DB.Raw(sql, 1000).Rows()
+	rows, err := Transaction.DB.Raw(sql, 1000).Rows()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -62,7 +63,7 @@ func Rows() {
 			Likes   int
 		}
 		var rs Result
-		if err := DB.ScanRows(rows, &rs); err != nil {
+		if err := Transaction.DB.ScanRows(rows, &rs); err != nil {
 			log.Fatalln(err)
 		}
 		fmt.Println(rs)
@@ -70,7 +71,7 @@ func Rows() {
 }
 
 func SessionIssue() {
-	db := DB.Model(&Content{}).Where("views > ?", 100)
+	db := Transaction.DB.Model(&Content{}).Where("views > ?", 100)
 	var cs1 []Content
 	db.Where("likes > ?", 99).Find(&cs1)
 
@@ -84,7 +85,7 @@ func SessionTest() {
 	// 将Session方法前的配置,记录到了当前的会话中
 	// 后边再次调用db的方法直到终结方法,会保持会话中的字句选项
 	// 执行完终结方法后,再次调用db的方法到终结
-	db := DB.Model(&Content{}).Where("views > ?", 100).
+	db := Transaction.DB.Model(&Content{}).Where("views > ?", 100).
 		Session(&gorm.Session{})
 
 	var cs1 []Content
@@ -96,7 +97,7 @@ func SessionTest() {
 }
 
 func SessionOption() {
-	db := DB.Model(&Content{}).Session(&gorm.Session{
+	db := Transaction.DB.Model(&Content{}).Session(&gorm.Session{
 		SkipHooks: true,
 	})
 	db.Save(&Content{Subject: "no hooks"})
@@ -108,7 +109,7 @@ func (c *Content) BeforeCreate(db *gorm.DB) error {
 }
 
 func DryRun() {
-	db := DB.Model(&Content{}).Session(&gorm.Session{
+	db := Transaction.DB.Model(&Content{}).Session(&gorm.Session{
 		// DryRun
 		DryRun: true,
 	})
@@ -125,7 +126,7 @@ func ContextTOCancel() {
 
 	// 传递Context执行
 	var cs []Content
-	if err := DB.WithContext(ctx).Limit(10).Find(&cs).Error; err != nil {
+	if err := Transaction.DB.WithContext(ctx).Limit(10).Find(&cs).Error; err != nil {
 		log.Fatalln(err)
 	}
 	fmt.Println(cs)

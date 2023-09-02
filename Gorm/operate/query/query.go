@@ -1,7 +1,7 @@
 package query
 
 import (
-	"Go_WorkSpace/Gorm/operate/update"
+	"Go_WorkSpace/Gorm/Transaction"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -29,12 +29,12 @@ type Content struct {
 }
 
 func GetPrimaryKey() {
-	update.DB.AutoMigrate(&Content{}, &ContentStrPK{})
+	Transaction.DB.AutoMigrate(&Content{}, &ContentStrPK{})
 
 	//一:查询单条
 	// 1.1主键为数值类型
 	c := &Content{}
-	if err := update.DB.First(&c, 10).Error; err != nil {
+	if err := Transaction.DB.First(&c, 10).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("Record Not Foud")
 		} else {
@@ -43,7 +43,7 @@ func GetPrimaryKey() {
 	}
 	// 1.2主键为string类型
 	CS := &ContentStrPK{}
-	if err := update.DB.First(&CS, "id= ?", "one").Error; err != nil {
+	if err := Transaction.DB.First(&CS, "id= ?", "one").Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("Record Not Foud")
 		} else {
@@ -53,7 +53,7 @@ func GetPrimaryKey() {
 	//二:查询多条
 	//2.1主键为数值类型
 	var IdSlice []Content
-	if err := update.DB.Find(&IdSlice, []uint{100, 200, 300}).Error; err != nil {
+	if err := Transaction.DB.Find(&IdSlice, []uint{100, 200, 300}).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("Record Not Foud")
 		} else {
@@ -62,7 +62,7 @@ func GetPrimaryKey() {
 	}
 	//2.2主键为字符串类型
 	var IDSlice2 []ContentStrPK
-	if err := update.DB.Find(&IDSlice2, "id IN ?", []string{"one", "two", "three"}).Error; err != nil {
+	if err := Transaction.DB.Find(&IDSlice2, "id IN ?", []string{"one", "two", "three"}).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("Record Not Foud")
 		} else {
@@ -73,7 +73,7 @@ func GetPrimaryKey() {
 
 func QueryOne() {
 	c := Content{}
-	if err := update.DB.First(&c, "id > ?", 42).Error; err != nil {
+	if err := Transaction.DB.First(&c, "id > ?", 42).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("Record Not Foud")
 		} else {
@@ -82,7 +82,7 @@ func QueryOne() {
 	}
 
 	o := Content{}
-	if err := update.DB.Last(&o, "id > ?", 42).Error; err != nil {
+	if err := Transaction.DB.Last(&o, "id > ?", 42).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("Record Not Foud")
 		} else {
@@ -91,7 +91,7 @@ func QueryOne() {
 	}
 
 	n := Content{}
-	if err := update.DB.Take(&n, "id > ?", 42).Error; err != nil {
+	if err := Transaction.DB.Take(&n, "id > ?", 42).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("Record Not Foud")
 		} else {
@@ -100,7 +100,7 @@ func QueryOne() {
 	}
 
 	f := Content{}
-	if err := update.DB.Limit(1).Find(&f, "id > ?", 42).Error; err != nil {
+	if err := Transaction.DB.Limit(1).Find(&f, "id > ?", 42).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("Record Not Foud")
 		} else {
@@ -109,7 +109,7 @@ func QueryOne() {
 	}
 
 	fs := Content{}
-	if err := update.DB.Find(&fs, "id > ?", 42).Error; err != nil {
+	if err := Transaction.DB.Find(&fs, "id > ?", 42).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("Record Not Foud")
 		} else {
@@ -121,7 +121,7 @@ func QueryOne() {
 func QueryToMap() {
 	//查询单条
 	One := map[string]any{}
-	if err := update.DB.Model(&Content{}).First(&One, 13).Error; err != nil {
+	if err := Transaction.DB.Model(&Content{}).First(&One, 13).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("Record Not Found")
 		} else {
@@ -137,7 +137,7 @@ func QueryToMap() {
 
 	//查询多条
 	Many := []map[string]any{}
-	if err := update.DB.Model(&Content{}).Find(&Many, []uint{13, 14, 15}).Error; err != nil {
+	if err := Transaction.DB.Model(&Content{}).Find(&Many, []uint{13, 14, 15}).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			log.Println("Record Not Found")
 		} else {
@@ -152,7 +152,7 @@ func QueryToMap() {
 func QueryPluck() {
 	//使用切片存储
 	Subjects := []sql.NullString{}
-	if err := update.DB.Model(&Content{}).Pluck("Subject", &Subjects).Error; err != nil {
+	if err := Transaction.DB.Model(&Content{}).Pluck("Subject", &Subjects).Error; err != nil {
 		log.Fatal(err)
 	}
 	for _, Subjects := range Subjects {
@@ -172,7 +172,7 @@ func QueryPluckEXP() {
 	//使用切片存储
 	Subjects := []sql.NullString{}
 	//Pluck中的column也可以用表达式
-	if err := update.DB.Model(&Content{}).Pluck("concat(subject,'-',likes)", &Subjects).Error; err != nil {
+	if err := Transaction.DB.Model(&Content{}).Pluck("concat(subject,'-',likes)", &Subjects).Error; err != nil {
 		log.Fatal(err)
 	}
 	for _, Subjects := range Subjects {
@@ -190,7 +190,7 @@ func QueryPluckEXP() {
 
 func QuerySelect() {
 	c := Content{}
-	if err := update.DB.Select("subject", "likes").First(&c, "14").Error; err != nil {
+	if err := Transaction.DB.Select("subject", "likes").First(&c, "14").Error; err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("%+v", c)
@@ -198,7 +198,7 @@ func QuerySelect() {
 
 func QuerySelectEXP() {
 	c := Content{}
-	if err := update.DB.Select("subject", "likes", "concat(subject,'-',likes) AS sv").First(&c, "14").Error; err != nil {
+	if err := Transaction.DB.Select("subject", "likes", "concat(subject,'-',likes) AS sv").First(&c, "14").Error; err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("%+v", c)
@@ -207,7 +207,7 @@ func QuerySelectEXP() {
 func QueryDistinct() {
 	c := Content{}
 
-	if err := update.DB.Distinct("*").First(&c, 14).Error; err != nil {
+	if err := Transaction.DB.Distinct("*").First(&c, 14).Error; err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("%-v", c)
@@ -223,7 +223,7 @@ func WhereMethod() {
 
 	// Where,通常在多态拼凑条件时使用
 	// Where返回DB对象,放到query保存
-	query := update.DB.Where("likes > ?", 100)
+	query := Transaction.DB.Where("likes > ?", 100)
 	// query再次调用Where,形成复合条件
 
 	Subject := "Sakura"
@@ -263,7 +263,7 @@ func WhereType() {
 	//}
 
 	//struct
-	query := update.DB.Where(Content{
+	query := Transaction.DB.Where(Content{
 		Views:   200,
 		Subject: "Sakura",
 	})
@@ -281,7 +281,7 @@ func PlaceHolder() {
 
 	// 具名
 	//query2 := DB.Where("likes = @like AND subject like @subject", sql.Named("like", 100), sql.Named("subject", "Sakura")) // Grom还支持使用map的形式具名
-	query3 := update.DB.Where("likes = @like AND subject like @subject", map[string]any{
+	query3 := Transaction.DB.Where("likes = @like AND subject like @subject", map[string]any{
 		"subject": "gorm%",
 		"like":    100,
 	})
@@ -296,7 +296,7 @@ func OrderBy() {
 	var cs []Content
 
 	ids := []uint{2, 3, 1}
-	query := update.DB.Clauses(clause.OrderBy{
+	query := Transaction.DB.Clauses(clause.OrderBy{
 		Expression: clause.Expr{
 			SQL:                "field(id, ?)",
 			Vars:               []any{ids},
@@ -341,7 +341,7 @@ func PageOperation(pager Page) {
 	offset := pagesize * (page - 1)
 
 	var content []Content
-	if err := update.DB.Offset(offset).Limit(pagesize).Find(&content); err != nil {
+	if err := Transaction.DB.Offset(offset).Limit(pagesize).Find(&content); err != nil {
 		log.Fatalln(err)
 	}
 }
@@ -372,13 +372,13 @@ func Paginate(pager Page) func(*gorm.DB) *gorm.DB {
 
 func PageScope(pager Page) {
 	var content []Content
-	if err := update.DB.Scopes(Paginate(pager)).Find(&content); err != nil {
+	if err := Transaction.DB.Scopes(Paginate(pager)).Find(&content); err != nil {
 		log.Fatalln(err)
 	}
 }
 
 func GroupHaving() {
-	update.DB.AutoMigrate(&Content{})
+	Transaction.DB.AutoMigrate(&Content{})
 
 	type Result struct {
 		UserID     uint
@@ -388,7 +388,7 @@ func GroupHaving() {
 	}
 
 	var rs []Result
-	if err := update.DB.Select("author_id", "SUM(likes) as total_likes", "SUM(views) as total_views", "AVG(views) as avg_views").
+	if err := Transaction.DB.Select("author_id", "SUM(likes) as total_likes", "SUM(views) as total_views", "AVG(views) as avg_views").
 		Group("author_id").Having("total_views > ?", 99).
 		Find(&rs).Error; err != nil {
 		log.Fatalln(err)
@@ -399,12 +399,12 @@ func GroupHaving() {
 
 func Locking() {
 	var cs []Content
-	if err := update.DB.Clauses(clause.Locking{Strength: "UPDATE"}).Find(&cs, "likes > ?", 10).Error; err != nil {
+	if err := Transaction.DB.Clauses(clause.Locking{Strength: "UPDATE"}).Find(&cs, "likes > ?", 10).Error; err != nil {
 		log.Fatalln(err)
 	}
 	//[4.904ms] [rows:19] SELECT * FROM `msb_content` WHERE likes > 10 AND `msb_content`.`deleted_at` IS NULL FOR UPDATE
 
-	if err := update.DB.Clauses(clause.Locking{Strength: "SHARE"}).Find(&cs, "likes > ?", 10).Error; err != nil {
+	if err := Transaction.DB.Clauses(clause.Locking{Strength: "SHARE"}).Find(&cs, "likes > ?", 10).Error; err != nil {
 		log.Fatalln(err)
 	}
 	// [2.663ms] [rows:19] SELECT * FROM `msb_content` WHERE likes > 10 AND `msb_content`.`deleted_at` IS NULL FOR SHARE
@@ -420,7 +420,7 @@ type Author struct {
 }
 
 func SubQuery() {
-	update.DB.AutoMigrate(&Author{}, &Content{})
+	Transaction.DB.AutoMigrate(&Author{}, &Content{})
 
 	//条件子查询
 	//select id form zuthor where status=0
@@ -439,8 +439,8 @@ func SubQuery() {
 	}
 	var rs []Result
 	//select subject, likes from content where publish_time is null
-	fromQuery := update.DB.Model(&Content{}).Select("subject", "likes").Where("publish_time is null")
-	if err := update.DB.Table("(?) as temp", fromQuery).
+	fromQuery := Transaction.DB.Model(&Content{}).Select("subject", "likes").Where("publish_time is null")
+	if err := Transaction.DB.Table("(?) as temp", fromQuery).
 		Where("likes > ?", 10).
 		Find(&rs).Error; err != nil {
 		log.Fatalln(err)
@@ -456,7 +456,7 @@ func (c *Content) AfterFind(db *gorm.DB) (err error) {
 
 func QueryHook() {
 	var c Content
-	if err := update.DB.First(&c, 13).Error; err != nil {
+	if err := Transaction.DB.First(&c, 13).Error; err != nil {
 		logrus.Error(err)
 	}
 }
